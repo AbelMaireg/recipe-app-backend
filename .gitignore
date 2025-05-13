@@ -1,0 +1,9 @@
+# build outputs
+build
+
+# env files
+.env*
+
+# code editors
+.vscode
+.idea
