@@ -20,3 +20,6 @@ run: build
 
 psql:
 	docker exec -it go-graphql-trial-postgres-1 psql -U postgres -d userapp
+
+gqlgen-init:
+	go run github.com/99designs/gqlgen init

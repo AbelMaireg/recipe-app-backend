@@ -1,0 +1,28 @@
+type User {
+  id: ID!
+  username: String!
+}
+
+input SignUpInput {
+  username: String!
+  password: String!
+}
+
+input SignInInput {
+  username: String!
+  password: String!
+}
+
+type SignInResponse {
+  token: String!
+  user: User!
+}
+
+type Query {
+  me: User!
+}
+
+type Mutation {
+  signUp(input: SignUpInput!): User!
+  signIn(input: SignInInput!): SignInResponse!
+}

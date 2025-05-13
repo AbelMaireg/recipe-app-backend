@@ -1,11 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+
+	"go-graphql-app/graph"
 	"go-graphql-app/models"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 func main() {
@@ -21,5 +26,15 @@ func main() {
 		log.Fatalf("Failed to auto-migrate: %v", err)
 	}
 
-	fmt.Println("Connected to Postgres and migrated users table!")
+	// Set up GraphQL server
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{DB: db},
+	}))
+
+	// GraphQL playground and endpoint
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", srv)
+
+	log.Println("GraphQL server running at http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
