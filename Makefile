@@ -17,3 +17,6 @@ build: fmt vet
 run: build
 	@echo " ## ##   RUNNING   ## ## "
 	@$(BINARY)
+
+psql:
+	docker exec -it go-graphql-trial-postgres-1 psql -U postgres -d userapp
