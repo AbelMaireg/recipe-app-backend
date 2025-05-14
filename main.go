@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"go-graphql-app/graph"
 	"go-graphql-app/middleware"
@@ -15,7 +16,7 @@ import (
 )
 
 func main() {
-	dsn := "host=localhost user=postgres password=secret dbname=userapp port=5432 sslmode=disable"
+	dsn := os.Getenv("DATABASE_URL")
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
