@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"go-graphql-app/graph"
+	"go-graphql-app/middleware"
 	"go-graphql-app/models"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -33,7 +34,7 @@ func main() {
 
 	// GraphQL playground and endpoint
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	http.Handle("/query", middleware.AuthMiddleware(srv))
 
 	log.Println("GraphQL server running at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

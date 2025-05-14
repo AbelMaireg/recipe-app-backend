@@ -9,7 +9,7 @@ fmt:
 vet:
 	@go vet ./...
 
-build: fmt vet
+build:
 	@echo " ## ##  BUILDING   ## ## "
 	@mkdir -p $(BUILD_DIR)
 	@go build -o $(BINARY) main.go

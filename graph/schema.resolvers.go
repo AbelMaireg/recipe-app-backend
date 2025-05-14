@@ -8,21 +8,82 @@ import (
 	"context"
 	"fmt"
 	"go-graphql-app/graph/model"
+	"go-graphql-app/models"
+	"go-graphql-app/utils"
 )
 
 // SignUp is the resolver for the signUp field.
 func (r *mutationResolver) SignUp(ctx context.Context, input model.SignUpInput) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: SignUp - signUp"))
+	// Hash the password
+	hashedPassword, err := utils.HashPassword(input.Password)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %v", err)
+	}
+
+	// Create user in database
+	dbUser := models.User{
+		Username: input.Username,
+		Password: hashedPassword,
+	}
+	if err := r.DB.Create(&dbUser).Error; err != nil {
+		return nil, fmt.Errorf("failed to create user: %v", err)
+	}
+
+	// Return GraphQL User type
+	return &model.User{
+		ID:       fmt.Sprintf("%d", dbUser.ID),
+		Username: dbUser.Username,
+	}, nil
 }
 
 // SignIn is the resolver for the signIn field.
 func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInInput) (*model.SignInResponse, error) {
-	panic(fmt.Errorf("not implemented: SignIn - signIn"))
+	// Find user by username
+	var dbUser models.User
+	if err := r.DB.Where("username = ?", input.Username).First(&dbUser).Error; err != nil {
+		return nil, fmt.Errorf("invalid username or password")
+	}
+
+	// Verify password
+	if err := utils.VerifyPassword(dbUser.Password, input.Password); err != nil {
+		return nil, fmt.Errorf("invalid username or password")
+	}
+
+	// Generate JWT
+	token, err := utils.GenerateJWT(dbUser.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate token: %v", err)
+	}
+
+	// Return response
+	return &model.SignInResponse{
+		Token: token,
+		User: &model.User{
+			ID:       fmt.Sprintf("%d", dbUser.ID),
+			Username: dbUser.Username,
+		},
+	}, nil
 }
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
+	// Get user ID from context (set by middleware)
+	userID, ok := ctx.Value("userID").(uint)
+	if !ok {
+		return nil, fmt.Errorf("unauthenticated")
+	}
+
+	// Fetch user from database
+	var dbUser models.User
+	if err := r.DB.First(&dbUser, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	// Return GraphQL User type
+	return &model.User{
+		ID:       fmt.Sprintf("%d", dbUser.ID),
+		Username: dbUser.Username,
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.
