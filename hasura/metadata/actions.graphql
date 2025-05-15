@@ -1,0 +1,31 @@
+type Mutation {
+  signIn(
+    arg1: SignInInput!
+  ): SignInOutput
+}
+
+type Mutation {
+  signUp(
+    arg1: SignUpInput!
+  ): SignUpOutput
+}
+
+input SignUpInput {
+  username: String!
+  password: String!
+}
+
+input SignInInput {
+  username: String!
+  password: String!
+}
+
+type SignUpOutput {
+  id: String!
+  username: String!
+}
+
+type SignInOutput {
+  token: String!
+}
+

@@ -1,0 +1,38 @@
+table:
+  name: users
+  schema: public
+computed_fields:
+  - name: role
+    definition:
+      function:
+        name: user_role
+        schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      columns:
+        - password
+        - username
+    comment: ""
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created_at
+        - id
+        - updated_at
+        - username
+      filter: {}
+    comment: ""
+event_triggers:
+  - name: user_created
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook: http://app:8080/events

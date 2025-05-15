@@ -1,0 +1,18 @@
+actions:
+  - name: signIn
+    definition:
+      kind: synchronous
+      handler: http://app:8080/actions
+  - name: signUp
+    definition:
+      kind: synchronous
+      handler: http://app:8080/actions
+custom_types:
+  enums: []
+  input_objects:
+    - name: SignUpInput
+    - name: SignInInput
+  objects:
+    - name: SignUpOutput
+    - name: SignInOutput
+  scalars: []

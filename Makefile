@@ -1,5 +1,8 @@
 BUILD_DIR := build
 BINARY := $(BUILD_DIR)/bin
+HASURA_GRAPHQL_ADMIN_SECRET := my-admin-secret
+HASURA_ENDPOINT_URI := http://localhost:8081
+HASURA_METADATA_DIR := hasura
 
 .PHONY: all clean
 
@@ -21,12 +24,6 @@ run: build
 psql:
 	docker exec -it go-graphql-trial-postgres-1 psql -U postgres -d userapp
 
-gqlgen-init:
-	go run github.com/99designs/gqlgen init
-
-gqlgen-generate:
-	go run github.com/99designs/gqlgen generate
-
 build-dev:
 	docker compose -f dev.compose.yml build
 
@@ -37,3 +34,6 @@ build-up-dev: build-dev up-dev
 
 down-dev:
 	docker compose -f dev.compose.yml down
+
+export-hasura-metadata:
+	hasura metadata export --endpoint $(HASURA_ENDPOINT_URI) --admin-secret $(HASURA_GRAPHQL_ADMIN_SECRET) --project $(HASURA_METADATA_DIR)
