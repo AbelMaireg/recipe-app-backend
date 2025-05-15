@@ -2,6 +2,7 @@ package main
 
 import (
 	"go-graphql-app/graph"
+	"go-graphql-app/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -27,6 +28,9 @@ func main() {
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{
+		MaxMemory: 32 << 20, // 32MB
+	})
 
 	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
 
@@ -35,8 +39,13 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 
+	// Add authentication middleware
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	http.Handle("/query", middleware.AuthMiddleware(srv))
+
+	// Serve uploaded files
+	fs := http.FileServer(http.Dir("uploads"))
+	http.Handle("/files/", http.StripPrefix("/files/", fs))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

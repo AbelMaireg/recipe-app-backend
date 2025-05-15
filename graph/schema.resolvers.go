@@ -6,10 +6,15 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go-graphql-app/graph/model"
 	"go-graphql-app/models"
 	"go-graphql-app/utils"
+	"time"
+
+	"github.com/99designs/gqlgen/graphql"
+	"gorm.io/gorm"
 )
 
 // SignUp is the resolver for the signUp field.
@@ -84,6 +89,99 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		ID:       fmt.Sprintf("%d", dbUser.ID),
 		Username: dbUser.Username,
 	}, nil
+}
+
+func (r *mutationResolver) UploadFile(ctx context.Context, file graphql.Upload) (*models.File, error) {
+	// Get user ID from context
+	userID, ok := ctx.Value("userID").(string)
+	if !ok {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	// Save the file
+	url, err := utils.SaveUploadedFile(&file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save file: %w", err)
+	}
+
+	// Create file record
+	fileModel := &models.File{
+		Filename:  file.Filename,
+		Mimetype:  file.ContentType,
+		URL:       url,
+		UserID:    userID,
+		CreatedAt: time.Now(),
+	}
+
+	if err := r.DB.Create(fileModel).Error; err != nil {
+		// Clean up the file if database operation fails
+		_ = utils.DeleteUploadedFile(url)
+		return nil, fmt.Errorf("failed to create file record: %w", err)
+	}
+
+	return fileModel, nil
+}
+
+func (r *mutationResolver) DeleteFile(ctx context.Context, id string) (bool, error) {
+	// Get user ID from context
+	userID, ok := ctx.Value("userID").(string)
+	if !ok {
+		return false, fmt.Errorf("unauthorized")
+	}
+
+	// Find the file
+	var file models.File
+	if err := r.DB.Where("id = ? AND user_id = ?", id, userID).First(&file).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, fmt.Errorf("file not found")
+		}
+		return false, fmt.Errorf("failed to find file: %w", err)
+	}
+
+	// Delete the file from storage
+	if err := utils.DeleteUploadedFile(file.URL); err != nil {
+		return false, fmt.Errorf("failed to delete file: %w", err)
+	}
+
+	// Delete the record from database
+	if err := r.DB.Delete(&file).Error; err != nil {
+		return false, fmt.Errorf("failed to delete file record: %w", err)
+	}
+
+	return true, nil
+}
+
+func (r *queryResolver) Files(ctx context.Context) ([]*models.File, error) {
+	// Get user ID from context
+	userID, ok := ctx.Value("userID").(string)
+	if !ok {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	var files []*models.File
+	if err := r.DB.Where("user_id = ?", userID).Find(&files).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch files: %w", err)
+	}
+
+	return files, nil
+}
+
+func (r *queryResolver) File(ctx context.Context, id string) (*models.File, error) {
+	// Get user ID from context
+	userID, ok := ctx.Value("userID").(string)
+	if !ok {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	var file models.File
+	if err := r.DB.Where("id = ? AND user_id = ?", id, userID).First(&file).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to fetch file: %w", err)
+	}
+
+	return &file, nil
 }
 
 // Mutation returns MutationResolver implementation.

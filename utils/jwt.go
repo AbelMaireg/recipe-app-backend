@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -11,7 +12,12 @@ const JWTSecret = "my-secret-key"
 
 // Claims defines the JWT claims structure
 type Claims struct {
-	UserID uint `json:"user_id"`
+	UserID       uint `json:"user_id"`
+	HasuraClaims struct {
+		XHasuraUserId       string   `json:"x-hasura-user-id"`
+		XHasuraDefaultRole  string   `json:"x-hasura-default-role"`
+		XHasuraAllowedRoles []string `json:"x-hasura-allowed-roles"`
+	} `json:"https://hasura.io/jwt/claims"`
 	jwt.RegisteredClaims
 }
 
@@ -19,6 +25,15 @@ type Claims struct {
 func GenerateJWT(userID uint) (string, error) {
 	claims := &Claims{
 		UserID: userID,
+		HasuraClaims: struct {
+			XHasuraUserId       string   `json:"x-hasura-user-id"`
+			XHasuraDefaultRole  string   `json:"x-hasura-default-role"`
+			XHasuraAllowedRoles []string `json:"x-hasura-allowed-roles"`
+		}{
+			XHasuraUserId:       fmt.Sprintf("%d", userID),
+			XHasuraDefaultRole:  "user",
+			XHasuraAllowedRoles: []string{"user"},
+		},
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
