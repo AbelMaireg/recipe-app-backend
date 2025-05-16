@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"go-graphql-app/models"
-	"go-graphql-app/utils"
+	"app/models"
+	"app/utils"
 )
 
 type UserEventPayload struct {

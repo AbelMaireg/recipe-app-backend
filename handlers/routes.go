@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"go-graphql-app/framework"
-	"go-graphql-app/services"
+	"app/framework"
+	"app/services"
 )
 
 func SetupRoutes(router *framework.Router, userService services.UserService) {

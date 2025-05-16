@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
-	"fmt"
-	"go-graphql-app/framework"
-	"go-graphql-app/services"
-	"go-graphql-app/utils"
+	"app/framework"
+	"app/services"
+	"app/utils"
 )
 
 type SignInInput struct {

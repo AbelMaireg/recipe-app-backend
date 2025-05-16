@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"go-graphql-app/framework"
-	"go-graphql-app/utils"
+	"app/framework"
+	"app/utils"
 )
 
 type DefaultHandler struct{}

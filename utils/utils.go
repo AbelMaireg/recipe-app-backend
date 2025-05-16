@@ -9,11 +9,11 @@ type errorResponse struct {
 	Error string `json:"error"`
 }
 
-func DecodeJSON(r *http.Request, v interface{}) error {
+func DecodeJSON(r *http.Request, v any) error {
 	return json.NewDecoder(r.Body).Decode(v)
 }
 
-func EncodeJSON(w http.ResponseWriter, v interface{}) {
+func EncodeJSON(w http.ResponseWriter, v any) {
 	json.NewEncoder(w).Encode(v)
 }
 

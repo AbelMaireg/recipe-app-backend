@@ -1,0 +1,22 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "make build-bin"
+bin = "./build/bin"
+include_ext = ["go"]
+exclude_dir = ["hasura", "tmp", "vendor", "node_modules"]
+exclude_file = []
+delay = 1000
+poll = true
+poll_interval = 500
+
+[log]
+main_only = false
+time = true
+
+[misc]
+clean_on_exit = true
+
+[screen]
+clear_on_rebuild = true

@@ -3,9 +3,9 @@ package services
 import (
 	"fmt"
 
-	"go-graphql-app/models"
-	"go-graphql-app/repositories"
-	"go-graphql-app/utils"
+	"app/models"
+	"app/repositories"
+	"app/utils"
 )
 
 type UserService interface {

@@ -4,11 +4,11 @@ import (
 	"log"
 	"net/http"
 
-	"go-graphql-app/config"
-	"go-graphql-app/framework"
-	"go-graphql-app/handlers"
-	"go-graphql-app/repositories"
-	"go-graphql-app/services"
+	"app/config"
+	"app/framework"
+	"app/handlers"
+	"app/repositories"
+	"app/services"
 )
 
 func main() {

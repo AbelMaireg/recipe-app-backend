@@ -7,10 +7,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// JWTSecret is the secret key for signing JWTs (in production, store in env)
 const JWTSecret = "my-secret-key"
 
-// Claims defines the JWT claims structure
 type Claims struct {
 	UserID       uint `json:"user_id"`
 	HasuraClaims struct {
@@ -21,7 +19,6 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// GenerateJWT creates a JWT for a user
 func GenerateJWT(userID uint) (string, error) {
 	claims := &Claims{
 		UserID: userID,
@@ -43,7 +40,6 @@ func GenerateJWT(userID uint) (string, error) {
 	return token.SignedString([]byte(JWTSecret))
 }
 
-// ParseJWT verifies a JWT and returns the claims
 func ParseJWT(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(JWTSecret), nil

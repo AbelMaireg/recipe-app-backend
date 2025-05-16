@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 
-	"go-graphql-app/models"
+	"app/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

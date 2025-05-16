@@ -1,5 +1,7 @@
 # build outputs
 build
+tmp
+cmd
 
 # env files
 .env*

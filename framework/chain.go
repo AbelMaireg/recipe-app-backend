@@ -1,8 +1,8 @@
 package framework
 
 import (
+	"app/utils"
 	"encoding/json"
-	"go-graphql-app/utils"
 	"net/http"
 	"strings"
 	"sync"

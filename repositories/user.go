@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"go-graphql-app/models"
+	"app/models"
 
 	"gorm.io/gorm"
 )

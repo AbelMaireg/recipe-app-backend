@@ -12,12 +12,13 @@ fmt:
 vet: fmt
 	@go vet ./...
 
-build:
+build-bin:
 	@echo " ## ##  BUILDING   ## ## "
 	@mkdir -p $(BUILD_DIR)
-	@go build -o $(BINARY) main.go
+	go mod download
+	go build -o $(BINARY) main.go
 
-run: build
+run: build-bin
 	@echo " ## ##   RUNNING   ## ## "
 	@$(BINARY)
 
