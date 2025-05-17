@@ -1,9 +1,13 @@
 actions:
-  - name: signIn
+  - name: deleteUser
     definition:
       kind: synchronous
       handler: http://app:8080/actions
-  - name: signUp
+  - name: signin
+    definition:
+      kind: synchronous
+      handler: http://app:8080/actions
+  - name: signup
     definition:
       kind: synchronous
       handler: http://app:8080/actions
@@ -12,7 +16,10 @@ custom_types:
   input_objects:
     - name: SignUpInput
     - name: SignInInput
+    - name: DeleteUserInput
   objects:
-    - name: SignUpOutput
-    - name: SignInOutput
+    - name: SignUpResponse
+    - name: SignInResponse
+    - name: UserOutput
+    - name: DeleteUserResponse
   scalars: []

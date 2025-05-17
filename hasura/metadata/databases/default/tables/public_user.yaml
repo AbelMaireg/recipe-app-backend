@@ -1,0 +1,35 @@
+table:
+  name: user
+  schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - bio
+        - created_at
+        - id
+        - name
+        - username
+      filter: {}
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - bio
+        - name
+        - username
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+      check:
+        id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+    comment: ""

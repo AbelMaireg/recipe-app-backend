@@ -1,18 +1,26 @@
 type Mutation {
-  signIn(
-    arg1: SignInInput!
-  ): SignInOutput
+  deleteUser(
+    arg1: DeleteUserInput!
+  ): DeleteUserResponse
 }
 
 type Mutation {
-  signUp(
+  signin(
+    arg1: SignInInput!
+  ): SignInResponse
+}
+
+type Mutation {
+  signup(
     arg1: SignUpInput!
-  ): SignUpOutput
+  ): SignUpResponse
 }
 
 input SignUpInput {
   username: String!
   password: String!
+  name: String!
+  bio: String
 }
 
 input SignInInput {
@@ -20,12 +28,30 @@ input SignInInput {
   password: String!
 }
 
-type SignUpOutput {
+input DeleteUserInput {
   id: String!
-  username: String!
 }
 
-type SignInOutput {
+type SignUpResponse {
+  id: String!
+  username: String!
+  name: String!
+  bio: String
+}
+
+type SignInResponse {
   token: String!
+  user: UserOutput!
+}
+
+type UserOutput {
+  id: String!
+  username: String!
+  name: String!
+  bio: String
+}
+
+type DeleteUserResponse {
+  message: String!
 }
 

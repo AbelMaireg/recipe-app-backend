@@ -1,0 +1,3 @@
+table:
+  name: recipe_picture
+  schema: public

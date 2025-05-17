@@ -1,15 +1,23 @@
 package models
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uint           `gorm:"primaryKey"`
-	Username  string         `gorm:"size:50;unique;not null"`
-	Password  string         `gorm:"not null"`
-	CreatedAt time.Time      `gorm:"default:CURRENT_TIMESTAMP"`
-	UpdatedAt time.Time      `gorm:"default:CURRENT_TIMESTAMP"`
-	DeletedAt gorm.DeletedAt `gorm:"index"` // Soft delete support
+	ID        uuid.UUID      `gorm:"type:uuid;primaryKey"`
+	Username  string         `gorm:"type:varchar(255);unique;not null"`
+	Name      string         `gorm:"type:varchar(255);not null"`
+	Bio       string         `gorm:"type:text"`
+	Password  string         `gorm:"type:varchar(255);not null"`
+	CreatedAt time.Time      `gorm:"type:timestamptz;default:CURRENT_TIMESTAMP"`
+	UpdatedAt time.Time      `gorm:"type:timestamptz;default:CURRENT_TIMESTAMP"`
+	DeletedAt gorm.DeletedAt `gorm:"type:timestamptz;index"`
+}
+
+func (User) TableName() string {
+	return "user"
 }

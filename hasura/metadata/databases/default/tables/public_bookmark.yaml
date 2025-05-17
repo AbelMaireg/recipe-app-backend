@@ -1,0 +1,3 @@
+table:
+  name: bookmark
+  schema: public

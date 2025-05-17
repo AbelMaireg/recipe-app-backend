@@ -6,10 +6,11 @@ import (
 	"app/models"
 	"app/repositories"
 	"app/utils"
+	"github.com/google/uuid"
 )
 
 type UserService interface {
-	SignUp(username, password string) (*models.User, error)
+	SignUp(username, password, name, bio string) (*models.User, error)
 	SignIn(username, password string) (string, *models.User, error)
 }
 
@@ -21,14 +22,17 @@ func NewUserService(userRepo repositories.UserRepository) UserService {
 	return &userService{userRepo: userRepo}
 }
 
-func (s *userService) SignUp(username, password string) (*models.User, error) {
+func (s *userService) SignUp(username, password, name, bio string) (*models.User, error) {
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 	user := &models.User{
+		ID:       uuid.New(),
 		Username: username,
 		Password: hashedPassword,
+		Name:     name,
+		Bio:      bio,
 	}
 	if err := s.userRepo.Create(user); err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)

@@ -1,0 +1,3 @@
+table:
+  name: rating
+  schema: public

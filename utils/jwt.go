@@ -1,16 +1,16 @@
 package utils
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
-const JWTSecret = "my-secret-key"
+const JWTSecret = "my-secret-key-my-secret-key-my-secret-key-my-secret-key"
 
 type Claims struct {
-	UserID       uint `json:"user_id"`
+	UserID       uuid.UUID `json:"user_id"`
 	HasuraClaims struct {
 		XHasuraUserId       string   `json:"x-hasura-user-id"`
 		XHasuraDefaultRole  string   `json:"x-hasura-default-role"`
@@ -19,7 +19,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(userID uint) (string, error) {
+func GenerateJWT(userID uuid.UUID) (string, error) {
 	claims := &Claims{
 		UserID: userID,
 		HasuraClaims: struct {
@@ -27,7 +27,7 @@ func GenerateJWT(userID uint) (string, error) {
 			XHasuraDefaultRole  string   `json:"x-hasura-default-role"`
 			XHasuraAllowedRoles []string `json:"x-hasura-allowed-roles"`
 		}{
-			XHasuraUserId:       fmt.Sprintf("%d", userID),
+			XHasuraUserId:       userID.String(),
 			XHasuraDefaultRole:  "user",
 			XHasuraAllowedRoles: []string{"user"},
 		},
