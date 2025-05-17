@@ -1,3 +1,12 @@
+-- Trigger function to update updated_at timestamps
+CREATE OR REPLACE FUNCTION update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- user
 CREATE TABLE "user" (
   "id" uuid NOT NULL,
@@ -12,6 +21,10 @@ CREATE TABLE "user" (
 );
 CREATE INDEX "user_index_username" ON "user" ("username");
 CREATE INDEX "user_index_created_at" ON "user" ("created_at");
+CREATE TRIGGER update_user_timestamp
+  BEFORE UPDATE ON "user"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- category
 CREATE TABLE "category" (
@@ -25,6 +38,10 @@ CREATE TABLE "category" (
 CREATE INDEX "category_index_label" ON "category" ("label");
 CREATE INDEX "category_index_created_at" ON "category" ("created_at");
 CREATE INDEX "category_search_vector_idx" ON "category" USING GIN ("search_vector");
+CREATE TRIGGER update_category_timestamp
+  BEFORE UPDATE ON "category"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- ingredient
 CREATE TABLE "ingredient" (
@@ -38,6 +55,10 @@ CREATE TABLE "ingredient" (
 CREATE INDEX "ingredient_index_name" ON "ingredient" ("name");
 CREATE INDEX "ingredient_index_created_at" ON "ingredient" ("created_at");
 CREATE INDEX "ingredient_search_vector_idx" ON "ingredient" USING GIN ("search_vector");
+CREATE TRIGGER update_ingredient_timestamp
+  BEFORE UPDATE ON "ingredient"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- tag
 CREATE TABLE "tag" (
@@ -49,6 +70,10 @@ CREATE TABLE "tag" (
 );
 CREATE INDEX "tag_index_name" ON "tag" ("name");
 CREATE INDEX "tag_index_created_at" ON "tag" ("created_at");
+CREATE TRIGGER update_tag_timestamp
+  BEFORE UPDATE ON "tag"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- recipe
 CREATE TABLE "recipe" (
@@ -73,6 +98,10 @@ CREATE INDEX "recipe_index_creator_id" ON "recipe" ("creator_id");
 CREATE INDEX "recipe_index_created_at" ON "recipe" ("created_at");
 CREATE INDEX "recipe_index_preparation_time" ON "recipe" ("preparation_time");
 CREATE INDEX "recipe_search_vector_idx" ON "recipe" USING GIN ("search_vector");
+CREATE TRIGGER update_recipe_timestamp
+  BEFORE UPDATE ON "recipe"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- recipe_tag
 CREATE TABLE "recipe_tag" (
@@ -96,6 +125,10 @@ CREATE TABLE "recipe_step" (
   PRIMARY KEY ("id")
 );
 CREATE UNIQUE INDEX "recipe_step_index_recipe_step" ON "recipe_step" ("recipe_id", "index");
+CREATE TRIGGER update_recipe_step_timestamp
+  BEFORE UPDATE ON "recipe_step"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- recipe_picture
 CREATE TABLE "recipe_picture" (
@@ -109,6 +142,10 @@ CREATE TABLE "recipe_picture" (
 CREATE INDEX "recipe_picture_index_path" ON "recipe_picture" ("path");
 CREATE INDEX "recipe_picture_index_created_at" ON "recipe_picture" ("created_at");
 CREATE INDEX "recipe_picture_index_recipe_id" ON "recipe_picture" ("recipe_id");
+CREATE TRIGGER update_recipe_picture_timestamp
+  BEFORE UPDATE ON "recipe_picture"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- recipe_ingredient
 CREATE TABLE "recipe_ingredient" (
@@ -168,6 +205,10 @@ CREATE TABLE "comment" (
 CREATE INDEX "comment_index_recipe_id" ON "comment" ("recipe_id");
 CREATE INDEX "comment_index_user_id" ON "comment" ("user_id");
 CREATE INDEX "comment_index_created_at" ON "comment" ("created_at");
+CREATE TRIGGER update_comment_timestamp
+  BEFORE UPDATE ON "comment"
+  FOR EACH ROW
+  EXECUTE FUNCTION update_timestamp();
 
 -- Foreign Keys
 ALTER TABLE "recipe" ADD CONSTRAINT "fk_recipe_category_id" FOREIGN KEY ("category_id") REFERENCES "category" ("id");
@@ -252,7 +293,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to execute on INSERT, UPDATE, or DELETE
 CREATE TRIGGER trigger_update_rating_stats
 AFTER INSERT OR UPDATE OF value OR DELETE ON "rating"
 FOR EACH ROW EXECUTE FUNCTION update_rating_stats();
