@@ -1,3 +1,12 @@
 table:
   name: liked_recipe
   schema: public
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created_at
+        - recipe_id
+        - user_id
+      filter: {}
+    comment: ""

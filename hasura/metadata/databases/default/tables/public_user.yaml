@@ -2,6 +2,16 @@ table:
   name: user
   schema: public
 select_permissions:
+  - role: public
+    permission:
+      columns:
+        - bio
+        - created_at
+        - id
+        - name
+        - username
+      filter: {}
+    comment: ""
   - role: user
     permission:
       columns:

@@ -1,3 +1,16 @@
 table:
   name: recipe_step
   schema: public
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created_at
+        - description
+        - id
+        - index
+        - picture_id
+        - recipe_id
+        - updated_at
+      filter: {}
+    comment: ""

@@ -1,3 +1,15 @@
 table:
   name: comment
   schema: public
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - content
+        - created_at
+        - id
+        - recipe_id
+        - updated_at
+        - user_id
+      filter: {}
+    comment: ""

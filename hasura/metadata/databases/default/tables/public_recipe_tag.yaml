@@ -1,3 +1,12 @@
 table:
   name: recipe_tag
   schema: public
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created_at
+        - recipe_id
+        - tag_id
+      filter: {}
+    comment: ""

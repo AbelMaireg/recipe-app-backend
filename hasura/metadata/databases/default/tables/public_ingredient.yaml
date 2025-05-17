@@ -1,3 +1,13 @@
 table:
   name: ingredient
   schema: public
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created_at
+        - id
+        - name
+        - updated_at
+      filter: {}
+    comment: ""

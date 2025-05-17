@@ -1,3 +1,14 @@
 table:
   name: recipe_picture
   schema: public
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created_at
+        - id
+        - path
+        - recipe_id
+        - updated_at
+      filter: {}
+    comment: ""

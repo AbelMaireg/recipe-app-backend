@@ -1,3 +1,12 @@
 table:
   name: category
   schema: public
+select_permissions:
+  - role: public
+    permission:
+      columns:
+        - created_at
+        - id
+        - label
+      filter: {}
+    comment: ""
