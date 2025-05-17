@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"app/framework"
@@ -13,6 +12,8 @@ import (
 type SignUpInput struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Name     string `json:"name"`
+	Bio      string `json:"bio"`
 }
 
 type SignUpInputWrapper struct {
@@ -22,6 +23,8 @@ type SignUpInputWrapper struct {
 type SignUpResponse struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
+	Name     string `json:"name"`
+	Bio      string `json:"bio"`
 }
 
 type SignUpHandler struct {
@@ -36,20 +39,22 @@ func (h *SignUpHandler) Handle(w http.ResponseWriter, r *http.Request, action fr
 	}
 
 	input := wrapper.Arg1
-	if input.Username == "" || input.Password == "" {
-		utils.WriteError(w, http.StatusBadRequest, "Username and password are required")
+	if input.Username == "" || input.Password == "" || input.Name == "" {
+		utils.WriteError(w, http.StatusBadRequest, "Username, password, and name are required")
 		return
 	}
 
-	user, err := h.userService.SignUp(input.Username, input.Password)
+	user, err := h.userService.SignUp(input.Username, input.Password, input.Name, input.Bio)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	response := SignUpResponse{
-		ID:       fmt.Sprint(user.ID),
+		ID:       user.ID.String(),
 		Username: user.Username,
+		Name:     user.Name,
+		Bio:      user.Bio,
 	}
 	utils.EncodeJSON(w, response)
 }

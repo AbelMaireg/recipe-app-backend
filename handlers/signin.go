@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"app/framework"
@@ -24,6 +23,8 @@ type SignInResponse struct {
 	User  struct {
 		ID       string `json:"id"`
 		Username string `json:"username"`
+		Name     string `json:"name"`
+		Bio      string `json:"bio"`
 	} `json:"user"`
 }
 
@@ -50,11 +51,11 @@ func (h *SignInHandler) Handle(w http.ResponseWriter, r *http.Request, action fr
 		return
 	}
 
-	response := SignInResponse{
-		Token: token,
-	}
-	response.User.ID = fmt.Sprint(user.ID)
+	response := SignInResponse{Token: token}
+	response.User.ID = user.ID.String()
 	response.User.Username = user.Username
+	response.User.Name = user.Name
+	response.User.Bio = user.Bio
 	utils.EncodeJSON(w, response)
 }
 

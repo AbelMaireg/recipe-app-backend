@@ -25,7 +25,7 @@ func HandleEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if payload.Event.Op == "INSERT" {
-		log.Printf("User created: ID=%d, Username=%s", payload.Event.Data.New.ID, payload.Event.Data.New.Username)
+		log.Printf("User created: ID=%s, Username=%s", payload.Event.Data.New.ID.String(), payload.Event.Data.New.Username)
 	}
 
 	w.WriteHeader(http.StatusOK)
