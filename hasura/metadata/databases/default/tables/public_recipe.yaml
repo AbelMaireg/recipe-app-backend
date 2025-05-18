@@ -1,6 +1,18 @@
 table:
   name: recipe
   schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        creator_id:
+          _eq: X-Hasura-User-Id
+      columns:
+        - category_id
+        - creator_id
+        - preparation_time
+        - title
+    comment: ""
 select_permissions:
   - role: public
     permission:
@@ -16,5 +28,26 @@ select_permissions:
         - thumbnail_id
         - title
         - updated_at
-      filter: {}
+      filter:
+        deleted_at:
+          _is_null: true
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - average_rating
+        - category_id
+        - created_at
+        - creator_id
+        - id
+        - like_count
+        - preparation_time
+        - rating_count
+        - search_vector
+        - thumbnail_id
+        - title
+        - updated_at
+      filter:
+        creator_id:
+          _eq: X-Hasura-User-Id
     comment: ""

@@ -1,4 +1,10 @@
 actions:
+  - name: createRecipe
+    definition:
+      kind: synchronous
+      handler: http://app:8080/actions
+    permissions:
+      - role: user
   - name: deleteUser
     definition:
       kind: synchronous
@@ -7,19 +13,28 @@ actions:
     definition:
       kind: synchronous
       handler: http://app:8080/actions
+    permissions:
+      - role: public
   - name: signup
     definition:
       kind: synchronous
       handler: http://app:8080/actions
+    permissions:
+      - role: public
 custom_types:
   enums: []
   input_objects:
     - name: SignUpInput
     - name: SignInInput
     - name: DeleteUserInput
+    - name: CreateRecipeInput
+    - name: RecipeIngredientInput
+    - name: RecipeStepInput
+    - name: RecipeTagInput
   objects:
     - name: SignUpResponse
     - name: SignInResponse
     - name: UserOutput
     - name: DeleteUserResponse
+    - name: CreateRecipeResponse
   scalars: []

@@ -296,3 +296,15 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_update_rating_stats
 AFTER INSERT OR UPDATE OF value OR DELETE ON "rating"
 FOR EACH ROW EXECUTE FUNCTION update_rating_stats();
+
+CREATE FUNCTION update_search_vector() RETURNS trigger AS $$
+BEGIN
+  NEW.search_vector := to_tsvector('english', NEW.title);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tsvector_update_trigger
+BEFORE INSERT OR UPDATE ON recipe
+FOR EACH ROW
+EXECUTE FUNCTION tsvector_update_trigger(search_vector, 'pg_catalog.english', title);

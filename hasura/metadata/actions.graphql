@@ -1,4 +1,10 @@
 type Mutation {
+  createRecipe(
+    arg1: CreateRecipeInput!
+  ): CreateRecipeResponse!
+}
+
+type Mutation {
   deleteUser(
     arg1: DeleteUserInput!
   ): DeleteUserResponse
@@ -32,6 +38,30 @@ input DeleteUserInput {
   id: String!
 }
 
+input CreateRecipeInput {
+  title: String!
+  category_id: uuid!
+  preparation_time: Int
+  ingredients: [RecipeIngredientInput!]!
+  steps: [RecipeStepInput!]!
+  tags: [RecipeTagInput!]
+}
+
+input RecipeIngredientInput {
+  ingredient_id: uuid!
+  quantity: Float!
+  unit: String!
+}
+
+input RecipeStepInput {
+  index: Int!
+  description: String!
+}
+
+input RecipeTagInput {
+  tag_id: uuid!
+}
+
 type SignUpResponse {
   id: String!
   username: String!
@@ -53,5 +83,12 @@ type UserOutput {
 
 type DeleteUserResponse {
   message: String!
+}
+
+type CreateRecipeResponse {
+  id: uuid!
+  title: String!
+  creator_id: String!
+  created_at: timestamptz!
 }
 

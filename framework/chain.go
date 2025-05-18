@@ -59,5 +59,6 @@ type HasuraAction struct {
 	Action struct {
 		Name string `json:"name"`
 	} `json:"action"`
-	Input json.RawMessage `json:"input"`
+	Input            json.RawMessage   `json:"input"`
+	SessionVariables map[string]string `json:"session_variables"`
 }

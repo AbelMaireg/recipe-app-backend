@@ -19,11 +19,13 @@ func SetupRoutes(router *framework.Router) {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	userRepo := repositories.NewUserRepository(db)
-	userService := services.NewUserService(userRepo)
+
+	userService := services.NewUserService(repositories.NewUserRepository(db))
+	recipeService := services.NewRecipeService(repositories.NewRecipeRepository(db))
 
 	RegisterSignUpHandler(userService)
 	RegisterSignInHandler(userService)
+	RegisterCreateRecipeHandler(recipeService)
 
 	router.AddPostHandler("/actions", framework.GetActionDispatcher(&DefaultHandler{}).Handle)
 	router.AddPostHandler("/events", HandleEvents)
