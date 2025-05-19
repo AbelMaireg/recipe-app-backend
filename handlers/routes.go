@@ -26,6 +26,7 @@ func SetupRoutes(router *framework.Router) {
 	RegisterSignUpHandler(userService)
 	RegisterSignInHandler(userService)
 	RegisterCreateRecipeHandler(recipeService)
+	RegisterUpdateRecipeHandler(recipeService)
 
 	router.AddPostHandler("/actions", framework.GetActionDispatcher(&DefaultHandler{}).Handle)
 	router.AddPostHandler("/events", HandleEvents)

@@ -21,6 +21,12 @@ actions:
       handler: http://app:8080/actions
     permissions:
       - role: public
+  - name: updateRecipe
+    definition:
+      kind: synchronous
+      handler: http://app:8080/actions
+    permissions:
+      - role: user
 custom_types:
   enums: []
   input_objects:
@@ -31,10 +37,12 @@ custom_types:
     - name: RecipeIngredientInput
     - name: RecipeStepInput
     - name: RecipeTagInput
+    - name: UpdateRecipeInput
   objects:
     - name: SignUpResponse
     - name: SignInResponse
     - name: UserOutput
     - name: DeleteUserResponse
     - name: CreateRecipeResponse
+    - name: UpdateRecipeOutput
   scalars: []

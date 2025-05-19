@@ -22,6 +22,12 @@ type Mutation {
   ): SignUpResponse
 }
 
+type Mutation {
+  updateRecipe(
+    arg1: UpdateRecipeInput!
+  ): UpdateRecipeOutput
+}
+
 input SignUpInput {
   username: String!
   password: String!
@@ -62,6 +68,16 @@ input RecipeTagInput {
   tag_id: uuid!
 }
 
+input UpdateRecipeInput {
+  id: uuid!
+  title: String!
+  category_id: uuid!
+  preparation_time: Int!
+  ingredients: [RecipeIngredientInput!]!
+  steps: [RecipeStepInput!]!
+  tags: [RecipeTagInput!]!
+}
+
 type SignUpResponse {
   id: String!
   username: String!
@@ -89,6 +105,13 @@ type CreateRecipeResponse {
   id: uuid!
   title: String!
   creator_id: String!
+  created_at: timestamptz!
+}
+
+type UpdateRecipeOutput {
+  id: uuid!
+  title: String!
+  creator_id: uuid!
   created_at: timestamptz!
 }
 
