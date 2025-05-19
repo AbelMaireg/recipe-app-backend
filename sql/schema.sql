@@ -14,8 +14,8 @@ CREATE TABLE "user" (
   "name" varchar(255) NOT NULL,
   "bio" text,
   "password" varchar(255) NOT NULL,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "deleted_at" timestamp with time zone,
   PRIMARY KEY ("id")
 );
@@ -30,8 +30,8 @@ CREATE TRIGGER update_user_timestamp
 CREATE TABLE "category" (
   "id" uuid NOT NULL,
   "label" varchar(100) NOT NULL UNIQUE,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "search_vector" tsvector GENERATED ALWAYS AS (to_tsvector('english', label)) STORED,
   PRIMARY KEY ("id")
 );
@@ -47,8 +47,8 @@ CREATE TRIGGER update_category_timestamp
 CREATE TABLE "ingredient" (
   "id" uuid NOT NULL,
   "name" varchar(100) NOT NULL UNIQUE,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "search_vector" tsvector GENERATED ALWAYS AS (to_tsvector('english', name)) STORED,
   PRIMARY KEY ("id")
 );
@@ -64,8 +64,8 @@ CREATE TRIGGER update_ingredient_timestamp
 CREATE TABLE "tag" (
   "id" uuid NOT NULL,
   "name" varchar(50) NOT NULL UNIQUE,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id")
 );
 CREATE INDEX "tag_index_name" ON "tag" ("name");
@@ -86,8 +86,8 @@ CREATE TABLE "recipe" (
   "like_count" bigint DEFAULT 0,
   "rating_count" bigint DEFAULT 0,
   "average_rating" decimal(3,2) DEFAULT 0.00,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "deleted_at" timestamp with time zone,
   "search_vector" tsvector GENERATED ALWAYS AS (to_tsvector('english', title)) STORED,
   PRIMARY KEY ("id")
@@ -107,7 +107,7 @@ CREATE TRIGGER update_recipe_timestamp
 CREATE TABLE "recipe_tag" (
   "recipe_id" uuid NOT NULL,
   "tag_id" uuid NOT NULL,
-  "created_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("recipe_id", "tag_id")
 );
 CREATE INDEX "recipe_tag_index_recipe_id" ON "recipe_tag" ("recipe_id");
@@ -120,8 +120,8 @@ CREATE TABLE "recipe_step" (
   "index" integer NOT NULL,
   "description" text NOT NULL,
   "picture_id" uuid,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id")
 );
 CREATE UNIQUE INDEX "recipe_step_index_recipe_step" ON "recipe_step" ("recipe_id", "index");
@@ -135,8 +135,8 @@ CREATE TABLE "recipe_picture" (
   "id" uuid NOT NULL,
   "recipe_id" uuid NOT NULL,
   "path" varchar(255) NOT NULL UNIQUE,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id")
 );
 CREATE INDEX "recipe_picture_index_path" ON "recipe_picture" ("path");
@@ -153,7 +153,7 @@ CREATE TABLE "recipe_ingredient" (
   "ingredient_id" uuid NOT NULL,
   "quantity" decimal NOT NULL,
   "unit" varchar(50) NOT NULL,
-  "created_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("recipe_id", "ingredient_id")
 );
 CREATE INDEX "recipe_ingredient_index_recipe_ingredient" ON "recipe_ingredient" ("recipe_id", "ingredient_id");
@@ -163,7 +163,7 @@ CREATE INDEX "recipe_ingredient_index_ingredient_created_at" ON "recipe_ingredie
 CREATE TABLE "liked_recipe" (
   "recipe_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
-  "created_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("recipe_id", "user_id")
 );
 CREATE INDEX "liked_recipe_index_user_id_created_at" ON "liked_recipe" ("user_id", "created_at");
@@ -174,7 +174,7 @@ CREATE TABLE "rating" (
   "recipe_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
   "value" integer NOT NULL,
-  "created_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("recipe_id", "user_id"),
   CONSTRAINT "check_rating_value" CHECK ("value" >= 1 AND "value" <= 5)
 );
@@ -185,7 +185,7 @@ CREATE INDEX "rating_index_recipe_id_created_at" ON "rating" ("recipe_id", "crea
 CREATE TABLE "bookmark" (
   "recipe_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
-  "created_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("recipe_id", "user_id")
 );
 CREATE INDEX "bookmark_index_user_id_created_at" ON "bookmark" ("user_id", "created_at");
@@ -197,8 +197,8 @@ CREATE TABLE "comment" (
   "recipe_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
   "content" text NOT NULL,
-  "created_at" timestamp with time zone NOT NULL,
-  "updated_at" timestamp with time zone NOT NULL,
+  "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "deleted_at" timestamp with time zone,
   PRIMARY KEY ("id")
 );
@@ -211,24 +211,91 @@ CREATE TRIGGER update_comment_timestamp
   EXECUTE FUNCTION update_timestamp();
 
 -- Foreign Keys
-ALTER TABLE "recipe" ADD CONSTRAINT "fk_recipe_category_id" FOREIGN KEY ("category_id") REFERENCES "category" ("id");
-ALTER TABLE "recipe" ADD CONSTRAINT "fk_recipe_creator_id" FOREIGN KEY ("creator_id") REFERENCES "user" ("id");
-ALTER TABLE "recipe" ADD CONSTRAINT "fk_recipe_thumbnail_id" FOREIGN KEY ("thumbnail_id") REFERENCES "recipe_picture" ("id");
-ALTER TABLE "recipe_step" ADD CONSTRAINT "fk_recipe_step_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "recipe_step" ADD CONSTRAINT "fk_recipe_step_picture_id" FOREIGN KEY ("picture_id") REFERENCES "recipe_picture" ("id");
-ALTER TABLE "recipe_picture" ADD CONSTRAINT "fk_recipe_picture_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "recipe_ingredient" ADD CONSTRAINT "fk_recipe_ingredient_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "recipe_ingredient" ADD CONSTRAINT "fk_recipe_ingredient_ingredient_id" FOREIGN KEY ("ingredient_id") REFERENCES "ingredient" ("id");
-ALTER TABLE "recipe_tag" ADD CONSTRAINT "fk_recipe_tag_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "recipe_tag" ADD CONSTRAINT "fk_recipe_tag_tag_id" FOREIGN KEY ("tag_id") REFERENCES "tag" ("id");
-ALTER TABLE "liked_recipe" ADD CONSTRAINT "fk_liked_recipe_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "liked_recipe" ADD CONSTRAINT "fk_liked_recipe_user_id" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "rating" ADD CONSTRAINT "fk_rating_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "rating" ADD CONSTRAINT "fk_rating_user_id" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "bookmark" ADD CONSTRAINT "fk_bookmark_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "bookmark" ADD CONSTRAINT "fk_bookmark_user_id" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "comment" ADD CONSTRAINT "fk_comment_recipe_id" FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id");
-ALTER TABLE "comment" ADD CONSTRAINT "fk_comment_user_id" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+ALTER TABLE "recipe"
+  ADD CONSTRAINT "fk_recipe_category_id"
+  FOREIGN KEY ("category_id") REFERENCES "category" ("id");
+
+ALTER TABLE "recipe"
+  ADD CONSTRAINT "fk_recipe_creator_id"
+  FOREIGN KEY ("creator_id") REFERENCES "user" ("id");
+
+ALTER TABLE "recipe"
+  ADD CONSTRAINT "fk_recipe_thumbnail_id"
+  FOREIGN KEY ("thumbnail_id") REFERENCES "recipe_picture" ("id");
+
+ALTER TABLE "recipe_step"
+  ADD CONSTRAINT "fk_recipe_step_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "recipe_step"
+  ADD CONSTRAINT "fk_recipe_step_picture_id"
+  FOREIGN KEY ("picture_id") REFERENCES "recipe_picture" ("id");
+
+ALTER TABLE "recipe_picture"
+  ADD CONSTRAINT "fk_recipe_picture_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "recipe_ingredient"
+  ADD CONSTRAINT "fk_recipe_ingredient_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "recipe_ingredient"
+  ADD CONSTRAINT "fk_recipe_ingredient_ingredient_id"
+  FOREIGN KEY ("ingredient_id") REFERENCES "ingredient" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "recipe_tag"
+  ADD CONSTRAINT "fk_recipe_tag_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "recipe_tag"
+  ADD CONSTRAINT "fk_recipe_tag_tag_id"
+  FOREIGN KEY ("tag_id") REFERENCES "tag" ("id")
+    ON DELETE SET NULL;
+
+ALTER TABLE "liked_recipe"
+  ADD CONSTRAINT "fk_liked_recipe_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "liked_recipe"
+  ADD CONSTRAINT "fk_liked_recipe_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "user" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "rating"
+  ADD CONSTRAINT "fk_rating_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "rating"
+  ADD CONSTRAINT "fk_rating_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "user" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "bookmark"
+  ADD CONSTRAINT "fk_bookmark_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "bookmark"
+  ADD CONSTRAINT "fk_bookmark_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "user" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "comment"
+  ADD CONSTRAINT "fk_comment_recipe_id"
+  FOREIGN KEY ("recipe_id") REFERENCES "recipe" ("id")
+    ON DELETE CASCADE;
+
+ALTER TABLE "comment"
+  ADD CONSTRAINT "fk_comment_user_id"
+  FOREIGN KEY ("user_id") REFERENCES "user" ("id")
+    ON DELETE CASCADE;
 
 -- Trigger for like_count
 CREATE OR REPLACE FUNCTION update_like_count()
