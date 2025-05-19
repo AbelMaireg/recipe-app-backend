@@ -51,3 +51,10 @@ select_permissions:
         creator_id:
           _eq: X-Hasura-User-Id
     comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        creator_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
