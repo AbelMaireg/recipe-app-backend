@@ -42,7 +42,7 @@ func (ad *ActionDispatcher) Handle(w http.ResponseWriter, r *http.Request) {
 
 	var action HasuraAction
 	if err := utils.DecodeJSON(r, &action); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, "Invalid request")
+		utils.WriteError(w, http.StatusBadRequest, "INVALID_REQUEST", "Invalid request format: "+err.Error())
 		return
 	}
 

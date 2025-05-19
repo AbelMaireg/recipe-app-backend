@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"app/framework"
@@ -55,45 +57,52 @@ type CreateRecipeHandler struct {
 func (h *CreateRecipeHandler) Handle(w http.ResponseWriter, r *http.Request, action framework.HasuraAction) {
 	var wrapper CreateRecipeInputWrapper
 	if err := json.Unmarshal(action.Input, &wrapper); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, "Invalid input: "+err.Error())
+		utils.WriteError(w, http.StatusBadRequest, "INVALID_INPUT", "Invalid input format: "+err.Error())
 		return
 	}
 
 	input := wrapper.Arg1
 	if input.Title == "" || input.CategoryID == "" || len(input.Steps) == 0 {
-		utils.WriteError(w, http.StatusBadRequest, "Title, category_id, and at least one step are required")
+		utils.WriteError(w, http.StatusBadRequest, "MISSING_REQUIRED_FIELDS", "Title, category_id, and at least one step are required")
 		return
 	}
 	if _, err := uuid.Parse(input.CategoryID); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, "Invalid category_id")
+		utils.WriteError(w, http.StatusBadRequest, "INVALID_UUID", "Invalid category_id: must be a valid UUID")
 		return
 	}
-	for _, ing := range input.Ingredients {
+	for i, ing := range input.Ingredients {
 		if _, err := uuid.Parse(ing.IngredientID); err != nil {
-			utils.WriteError(w, http.StatusBadRequest, "Invalid ingredient_id")
+			utils.WriteError(w, http.StatusBadRequest, "INVALID_UUID", "Invalid ingredient_id at index "+strconv.Itoa(i)+": must be a valid UUID")
 			return
 		}
 		if ing.Quantity <= 0 || ing.Unit == "" {
-			utils.WriteError(w, http.StatusBadRequest, "Invalid quantity or unit")
+			utils.WriteError(w, http.StatusBadRequest, "INVALID_INGREDIENT", "Invalid quantity or unit at ingredient index "+strconv.Itoa(i))
 			return
 		}
 	}
-	for _, step := range input.Steps {
+	// Validate unique step indices
+	stepIndices := make(map[int]bool)
+	for i, step := range input.Steps {
 		if step.Index < 1 || step.Description == "" {
-			utils.WriteError(w, http.StatusBadRequest, "Invalid step index or description")
+			utils.WriteError(w, http.StatusBadRequest, "INVALID_STEP", "Invalid step index or description at step index "+strconv.Itoa(i))
 			return
 		}
+		if stepIndices[step.Index] {
+			utils.WriteError(w, http.StatusBadRequest, "DUPLICATE_STEP_INDEX", "Duplicate step index "+strconv.Itoa(step.Index)+" provided")
+			return
+		}
+		stepIndices[step.Index] = true
 	}
-	for _, tag := range input.Tags {
+	for i, tag := range input.Tags {
 		if _, err := uuid.Parse(tag.TagID); err != nil {
-			utils.WriteError(w, http.StatusBadRequest, "Invalid tag_id")
+			utils.WriteError(w, http.StatusBadRequest, "INVALID_UUID", "Invalid tag_id at index "+strconv.Itoa(i)+": must be a valid UUID")
 			return
 		}
 	}
 
 	userID, ok := action.SessionVariables["x-hasura-user-id"]
 	if !ok {
-		utils.WriteError(w, http.StatusUnauthorized, "Unauthorized: Missing user ID")
+		utils.WriteError(w, http.StatusUnauthorized, "UNAUTHORIZED", "Unauthorized: Missing user ID in session")
 		return
 	}
 
@@ -140,7 +149,17 @@ func (h *CreateRecipeHandler) Handle(w http.ResponseWriter, r *http.Request, act
 	}
 
 	if err := h.recipeService.CreateRecipe(userID, recipe, recipeIngredients, recipeSteps, recipeTags); err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err.Error())
+		if strings.Contains(err.Error(), "foreign key") || strings.Contains(err.Error(), "not found") {
+			utils.WriteError(w, http.StatusBadRequest, "INVALID_REFERENCE", "Invalid reference: Category, ingredient, or tag does not exist")
+		} else if strings.Contains(err.Error(), "creator_id") {
+			utils.WriteError(w, http.StatusForbidden, "FORBIDDEN_CREATOR", "Creator ID does not match authenticated user")
+		} else if strings.Contains(err.Error(), "search_vector") {
+			utils.WriteError(w, http.StatusInternalServerError, "SEARCH_VECTOR_ERROR", "Failed to process full-text search data")
+		} else if strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "23505") {
+			utils.WriteError(w, http.StatusBadRequest, "DUPLICATE_STEP_INDEX", "Duplicate step index provided")
+		} else {
+			utils.WriteError(w, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "Failed to create recipe: "+err.Error())
+		}
 		return
 	}
 

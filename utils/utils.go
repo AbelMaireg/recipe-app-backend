@@ -5,8 +5,23 @@ import (
 	"net/http"
 )
 
-type errorResponse struct {
-	Error string `json:"error"`
+type ErrorMessage struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+}
+
+func WriteError(w http.ResponseWriter, status int, errorCode, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	errorMessage := ErrorMessage{
+		Code:        errorCode,
+		Description: message,
+	}
+	// Serialize ErrorMessage as a JSON string
+	jsonMessage, _ := json.Marshal(errorMessage)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": string(jsonMessage),
+	})
 }
 
 func DecodeJSON(r *http.Request, v any) error {
@@ -15,10 +30,4 @@ func DecodeJSON(r *http.Request, v any) error {
 
 func EncodeJSON(w http.ResponseWriter, v any) {
 	json.NewEncoder(w).Encode(v)
-}
-
-func WriteError(w http.ResponseWriter, status int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	EncodeJSON(w, errorResponse{Error: message})
 }

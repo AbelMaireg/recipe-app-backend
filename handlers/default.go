@@ -10,5 +10,5 @@ import (
 type DefaultHandler struct{}
 
 func (h *DefaultHandler) Handle(w http.ResponseWriter, r *http.Request, action framework.HasuraAction) {
-	utils.WriteError(w, http.StatusBadRequest, "Unknown action")
+	utils.WriteError(w, http.StatusBadRequest, "UNKNOWN_ACTION", "Unknown action")
 }

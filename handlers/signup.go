@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"app/framework"
 	"app/services"
@@ -34,19 +35,31 @@ type SignUpHandler struct {
 func (h *SignUpHandler) Handle(w http.ResponseWriter, r *http.Request, action framework.HasuraAction) {
 	var wrapper SignUpInputWrapper
 	if err := json.Unmarshal(action.Input, &wrapper); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, "Invalid input: "+err.Error())
+		utils.WriteError(w, http.StatusBadRequest, "INVALID_INPUT", "Invalid input format: "+err.Error())
 		return
 	}
 
 	input := wrapper.Arg1
 	if input.Username == "" || input.Password == "" || input.Name == "" {
-		utils.WriteError(w, http.StatusBadRequest, "Username, password, and name are required")
+		utils.WriteError(w, http.StatusBadRequest, "MISSING_REQUIRED_FIELDS", "Username, password, and name are required")
+		return
+	}
+
+	// Basic password validation
+	if len(input.Password) < 8 {
+		utils.WriteError(w, http.StatusBadRequest, "INVALID_PASSWORD", "Password must be at least 8 characters long")
 		return
 	}
 
 	user, err := h.userService.SignUp(input.Username, input.Password, input.Name, input.Bio)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err.Error())
+		if strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "unique constraint") || strings.Contains(err.Error(), "username") {
+			utils.WriteError(w, http.StatusBadRequest, "USERNAME_TAKEN", "Username is already taken")
+		} else if strings.Contains(err.Error(), "password") {
+			utils.WriteError(w, http.StatusBadRequest, "INVALID_PASSWORD", "Invalid password format")
+		} else {
+			utils.WriteError(w, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "Failed to sign up: "+err.Error())
+		}
 		return
 	}
 

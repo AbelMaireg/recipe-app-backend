@@ -20,7 +20,7 @@ type UserEventPayload struct {
 func HandleEvents(w http.ResponseWriter, r *http.Request) {
 	var payload UserEventPayload
 	if err := utils.DecodeJSON(r, &payload); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, "Invalid event payload")
+		utils.WriteError(w, http.StatusBadRequest, "INVALID_EVENT_PAYLOAD", "Invalid event payload")
 		return
 	}
 
