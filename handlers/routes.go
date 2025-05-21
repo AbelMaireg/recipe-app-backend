@@ -28,6 +28,7 @@ func SetupRoutes(router *framework.Router) {
 	userService := services.NewUserService(repositories.NewUserRepository(db))
 	recipeService := services.NewRecipeService(repositories.NewRecipeRepository(db))
 	recipePictureUploadHandler := NewUploadRecipePictureHandler(recipeService, minioClient, minioCfg.Bucket)
+	recipePictureGetHandler := NewGetRecipePictureHandler(recipeService, minioClient, minioCfg.Bucket)
 
 	RegisterSignUpHandler(userService)
 	RegisterSignInHandler(userService)
@@ -35,4 +36,5 @@ func SetupRoutes(router *framework.Router) {
 	router.AddPostHandler("/actions", framework.GetActionDispatcher(&DefaultHandler{}).Handle)
 	router.AddPostHandler("/events", HandleEvents)
 	router.AddPostHandler("/api/recipe/upload_picture", recipePictureUploadHandler.Handle)
+	router.AddGetHandler("/api/recipe/picture/{id}", recipePictureGetHandler.Handle)
 }

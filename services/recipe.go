@@ -10,6 +10,7 @@ import (
 
 type RecipeService interface {
 	SaveRecipePicture(recipeID uuid.UUID, path string) (*models.RecipePicture, error)
+	FindRecipePictureByID(id uuid.UUID) (*models.RecipePicture, error)
 }
 
 type recipeService struct {
@@ -31,5 +32,13 @@ func (r *recipeService) SaveRecipePicture(recipeID uuid.UUID, path string) (*mod
 		return nil, fmt.Errorf("failed to save recipe picture: %w", err)
 	}
 
+	return picture, nil
+}
+
+func (r *recipeService) FindRecipePictureByID(id uuid.UUID) (*models.RecipePicture, error) {
+	picture, err := r.repository.FindRecipePictureByID(id.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to find recipe picture: %w", err)
+	}
 	return picture, nil
 }

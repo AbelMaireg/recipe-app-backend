@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"app/utils"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
@@ -112,4 +114,69 @@ func (h *UploadRecipePictureHandler) Handle(w http.ResponseWriter, r *http.Reque
 		CreatedAt: picture.CreatedAt,
 	}
 	utils.EncodeJSON(w, response)
+}
+
+type GetRecipePictureHandler struct {
+	recipeService services.RecipeService
+	s3Client      *s3.Client
+	bucketName    string
+}
+
+func NewGetRecipePictureHandler(recipeService services.RecipeService, s3Client *s3.Client, bucketName string) *GetRecipePictureHandler {
+	return &GetRecipePictureHandler{
+		recipeService: recipeService,
+		s3Client:      s3Client,
+		bucketName:    bucketName,
+	}
+}
+
+func (h *GetRecipePictureHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	pictureIDStr := chi.URLParam(r, "id")
+	if pictureIDStr == "" {
+		utils.WriteError(w, http.StatusBadRequest, "MISSING_ID", "Picture ID is required")
+		return
+	}
+
+	pictureID, err := uuid.Parse(pictureIDStr)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, "INVALID_ID", "Invalid picture ID: "+err.Error())
+		return
+	}
+
+	picture, err := h.recipeService.FindRecipePictureByID(pictureID)
+	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			utils.WriteError(w, http.StatusNotFound, "NOT_FOUND", "Picture not found")
+		} else {
+			utils.WriteError(w, http.StatusInternalServerError, "DB_ERROR", "Failed to fetch picture: "+err.Error())
+		}
+		return
+	}
+
+	obj, err := h.s3Client.GetObject(context.Background(), &s3.GetObjectInput{
+		Bucket: &h.bucketName,
+		Key:    &picture.Path,
+	})
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "MINIO_ERROR", "Failed to fetch image from MinIO: "+err.Error())
+		return
+	}
+	defer obj.Body.Close()
+
+	contentType := "application/octet-stream"
+	if strings.HasSuffix(picture.Path, ".jpg") || strings.HasSuffix(picture.Path, ".jpeg") {
+		contentType = "image/jpeg"
+	} else if strings.HasSuffix(picture.Path, ".png") {
+		contentType = "image/png"
+	}
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", obj.ContentLength))
+	w.Header().Set("Cache-Control", "max-age=31536000")
+
+	_, err = io.Copy(w, obj.Body)
+	if err != nil {
+		fmt.Printf("Error streaming image: %v\n", err)
+		return
+	}
 }
