@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -41,7 +42,13 @@ func GenerateJWT(userID uuid.UUID) (string, error) {
 }
 
 func ParseJWT(tokenString string) (*Claims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	authTokenString := strings.Split(tokenString, " ")
+
+	if authTokenString[0] != "Bearer" {
+		return nil, jwt.ErrTokenMalformed
+	}
+
+	token, err := jwt.ParseWithClaims(authTokenString[1], &Claims{}, func(token *jwt.Token) (any, error) {
 		return []byte(JWTSecret), nil
 	})
 	if err != nil {
