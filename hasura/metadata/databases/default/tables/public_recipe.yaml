@@ -7,10 +7,14 @@ insert_permissions:
       check:
         creator_id:
           _eq: X-Hasura-User-Id
+      set:
+        created_at: ""
+        creator_id: x-hasura-User-Id
       columns:
         - category_id
         - creator_id
         - preparation_time
+        - thumbnail_id
         - title
     comment: ""
 select_permissions:
@@ -43,13 +47,27 @@ select_permissions:
         - like_count
         - preparation_time
         - rating_count
-        - search_vector
         - thumbnail_id
         - title
         - updated_at
       filter:
+        _and:
+          - creator_id:
+              _eq: X-Hasura-User-Id
+          - deleted_at:
+              _is_null: false
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - category_id
+        - thumbnail_id
+        - title
+      filter:
         creator_id:
           _eq: X-Hasura-User-Id
+      check: null
     comment: ""
 delete_permissions:
   - role: user

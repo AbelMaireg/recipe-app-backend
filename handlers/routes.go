@@ -21,12 +21,9 @@ func SetupRoutes(router *framework.Router) {
 	}
 
 	userService := services.NewUserService(repositories.NewUserRepository(db))
-	recipeService := services.NewRecipeService(repositories.NewRecipeRepository(db))
 
 	RegisterSignUpHandler(userService)
 	RegisterSignInHandler(userService)
-	RegisterCreateRecipeHandler(recipeService)
-	RegisterUpdateRecipeHandler(recipeService)
 
 	router.AddPostHandler("/actions", framework.GetActionDispatcher(&DefaultHandler{}).Handle)
 	router.AddPostHandler("/events", HandleEvents)

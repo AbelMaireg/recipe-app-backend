@@ -1,6 +1,23 @@
 table:
   name: recipe_ingredient
   schema: public
+object_relationships:
+  - name: recipe
+    using:
+      foreign_key_constraint_on: recipe_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        recipe:
+          creator_id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - ingredient_id
+        - quantity
+        - recipe_id
+        - unit
+    comment: ""
 select_permissions:
   - role: public
     permission:
@@ -11,4 +28,25 @@ select_permissions:
         - recipe_id
         - unit
       filter: {}
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - ingredient_id
+        - quantity
+        - unit
+      filter:
+        recipe:
+          creator_id:
+            _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        recipe:
+          creator_id:
+            _eq: X-Hasura-User-Id
     comment: ""
