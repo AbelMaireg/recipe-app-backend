@@ -171,7 +171,6 @@ func (h *GetRecipePictureHandler) Handle(w http.ResponseWriter, r *http.Request)
 		contentType = "image/png"
 	}
 	w.Header().Set("Content-Type", contentType)
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", obj.ContentLength))
 	w.Header().Set("Cache-Control", "max-age=31536000")
 
 	_, err = io.Copy(w, obj.Body)
