@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16
+    container_name: recipe-app-database
     ports:
       - "5432:5432"
     environment:
@@ -16,6 +17,7 @@ services:
       retries: 5
   hasura:
     image: hasura/graphql-engine:v2.48.0
+    container_name: recipe-app-hasura-instance
     ports:
       - "8081:8080"
     depends_on:
@@ -28,10 +30,16 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: my-admin-secret
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: public
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
   app:
     build:
       context: .
       dockerfile: dev.Dockerfile
+    container_name: recipe-app-go-client
     ports:
       - 8080:8080
     environment:
@@ -42,8 +50,14 @@ services:
         condition: service_healthy
     volumes:
       - .:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health_check"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: recipe-app-minio-instance
     ports:
       - "9000:9000"
       - "9001:9001"
