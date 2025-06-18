@@ -36,5 +36,16 @@ build-up-dev: build-dev up-dev
 down-dev:
 	docker compose -f dev.compose.yml down
 
+restart-dev: down-dev up-dev
+
 export-hasura-metadata:
-	hasura metadata export --endpoint $(HASURA_ENDPOINT_URI) --admin-secret $(HASURA_GRAPHQL_ADMIN_SECRET) --project $(HASURA_METADATA_DIR)
+	hasura metadata export \
+		--endpoint $(HASURA_ENDPOINT_URI) \
+		--admin-secret $(HASURA_GRAPHQL_ADMIN_SECRET) \
+		--project $(HASURA_METADATA_DIR)
+
+apply-hasura-metadata:
+	hasura metadata apply \
+  	--endpoint $(HASURA_ENDPOINT_URI) \
+  	--admin-secret $(HASURA_GRAPHQL_ADMIN_SECRET) \
+  	--project $(HASURA_METADATA_DIR)
