@@ -11,3 +11,11 @@ select_permissions:
         - updated_at
       filter: {}
     comment: ""
+  - role: user
+    permission:
+      columns:
+        - created_at
+        - id
+        - name
+      filter: {}
+    comment: ""
