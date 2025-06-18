@@ -1,10 +1,4 @@
 type Mutation {
-  createRecipe(
-    arg1: CreateRecipeInput!
-  ): CreateRecipeResponse!
-}
-
-type Mutation {
   deleteUser(
     arg1: DeleteUserInput!
   ): DeleteUserResponse
@@ -20,12 +14,6 @@ type Mutation {
   signup(
     arg1: SignUpInput!
   ): SignUpResponse
-}
-
-type Mutation {
-  updateRecipe(
-    arg1: UpdateRecipeInput!
-  ): UpdateRecipeOutput
 }
 
 input SignUpInput {

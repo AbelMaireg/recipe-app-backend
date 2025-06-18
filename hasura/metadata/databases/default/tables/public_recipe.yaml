@@ -1,6 +1,73 @@
 table:
   name: recipe
   schema: public
+object_relationships:
+  - name: category
+    using:
+      foreign_key_constraint_on: category_id
+  - name: recipe_picture
+    using:
+      foreign_key_constraint_on: thumbnail_id
+  - name: user
+    using:
+      foreign_key_constraint_on: creator_id
+array_relationships:
+  - name: bookmarks
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: bookmark
+          schema: public
+  - name: comments
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: comment
+          schema: public
+  - name: liked_recipes
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: liked_recipe
+          schema: public
+  - name: ratings
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: rating
+          schema: public
+  - name: recipe_ingredients
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: recipe_ingredient
+          schema: public
+  - name: recipe_pictures
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: recipe_picture
+          schema: public
+  - name: recipe_steps
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: recipe_step
+          schema: public
+  - name: recipe_tags
+    using:
+      foreign_key_constraint_on:
+        column: recipe_id
+        table:
+          name: recipe_tag
+          schema: public
 insert_permissions:
   - role: user
     permission:

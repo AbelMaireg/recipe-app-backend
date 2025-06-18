@@ -1,10 +1,4 @@
 actions:
-  - name: createRecipe
-    definition:
-      kind: synchronous
-      handler: http://app:8080/actions
-    permissions:
-      - role: user
   - name: deleteUser
     definition:
       kind: synchronous
@@ -21,12 +15,6 @@ actions:
       handler: http://app:8080/actions
     permissions:
       - role: public
-  - name: updateRecipe
-    definition:
-      kind: synchronous
-      handler: http://app:8080/actions
-    permissions:
-      - role: user
 custom_types:
   enums: []
   input_objects:

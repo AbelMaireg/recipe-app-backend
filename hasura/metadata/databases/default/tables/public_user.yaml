@@ -1,6 +1,35 @@
 table:
   name: user
   schema: public
+array_relationships:
+  - name: bookmarks
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: bookmark
+          schema: public
+  - name: liked_recipes
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: liked_recipe
+          schema: public
+  - name: ratings
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: rating
+          schema: public
+  - name: recipes
+    using:
+      foreign_key_constraint_on:
+        column: creator_id
+        table:
+          name: recipe
+          schema: public
 select_permissions:
   - role: public
     permission:
