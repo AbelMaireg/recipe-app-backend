@@ -9,7 +9,7 @@ $$ LANGUAGE plpgsql;
 
 -- user
 CREATE TABLE "user" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "username" varchar(255) NOT NULL UNIQUE,
   "name" varchar(255) NOT NULL,
   "bio" text,
@@ -28,7 +28,7 @@ CREATE TRIGGER update_user_timestamp
 
 -- category
 CREATE TABLE "category" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "label" varchar(100) NOT NULL UNIQUE,
   "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,7 +45,7 @@ CREATE TRIGGER update_category_timestamp
 
 -- ingredient
 CREATE TABLE "ingredient" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "name" varchar(100) NOT NULL UNIQUE,
   "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -62,7 +62,7 @@ CREATE TRIGGER update_ingredient_timestamp
 
 -- tag
 CREATE TABLE "tag" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "name" varchar(50) NOT NULL UNIQUE,
   "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -77,7 +77,7 @@ CREATE TRIGGER update_tag_timestamp
 
 -- recipe
 CREATE TABLE "recipe" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "title" varchar(255) NOT NULL,
   "category_id" uuid NOT NULL,
   "creator_id" uuid NOT NULL,
@@ -105,7 +105,7 @@ CREATE TRIGGER update_recipe_timestamp
 
 -- recipe_tag
 CREATE TABLE "recipe_tag" (
-  "recipe_id" uuid NOT NULL,
+  "recipe_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "tag_id" uuid NOT NULL,
   "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("recipe_id", "tag_id")
@@ -115,7 +115,7 @@ CREATE INDEX "recipe_tag_index_tag_id" ON "recipe_tag" ("tag_id");
 
 -- recipe_step
 CREATE TABLE "recipe_step" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "recipe_id" uuid NOT NULL,
   "index" integer NOT NULL,
   "description" text NOT NULL,
@@ -132,7 +132,7 @@ CREATE TRIGGER update_recipe_step_timestamp
 
 -- recipe_picture
 CREATE TABLE "recipe_picture" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "recipe_id" uuid NOT NULL,
   "path" varchar(255) NOT NULL UNIQUE,
   "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -193,7 +193,7 @@ CREATE INDEX "bookmark_index_recipe_id_created_at" ON "bookmark" ("recipe_id", "
 
 -- comment
 CREATE TABLE "comment" (
-  "id" uuid NOT NULL,
+  "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
   "recipe_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
   "content" text NOT NULL,
