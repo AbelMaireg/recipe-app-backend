@@ -36,7 +36,7 @@ func SetupRoutes(router *framework.Router) {
 
 	router.AddPostHandler("/actions", framework.GetActionDispatcher(&DefaultHandler{}).Handle)
 	router.AddPostHandler("/events", HandleEvents)
-	router.AddPostHandler("/api/recipe/upload_picture", recipePictureUploadHandler.Handle)
+	router.AddPostHandler("/api/recipe/picture", recipePictureUploadHandler.Handle)
 	router.AddGetHandler("/api/recipe/picture/{id}", recipePictureGetHandler.Handle)
 	router.AddGetHandler("/health_check", healthCheckHandler.Handle)
 }

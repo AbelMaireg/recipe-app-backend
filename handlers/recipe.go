@@ -80,7 +80,7 @@ func (h *UploadRecipePictureHandler) Handle(w http.ResponseWriter, r *http.Reque
 	}
 
 	fileID := uuid.New()
-	objectKey := fmt.Sprintf("recipe/%s/%s%s", recipeID, fileID, ext)
+	objectKey := fmt.Sprintf("%s%s", fileID, ext)
 
 	_, err = h.s3Client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket:      &h.bucketName,
