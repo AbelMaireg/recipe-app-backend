@@ -2,6 +2,9 @@ table:
   name: recipe_ingredient
   schema: public
 object_relationships:
+  - name: ingredient
+    using:
+      foreign_key_constraint_on: ingredient_id
   - name: recipe
     using:
       foreign_key_constraint_on: recipe_id
@@ -23,6 +26,15 @@ select_permissions:
     permission:
       columns:
         - created_at
+        - ingredient_id
+        - quantity
+        - recipe_id
+        - unit
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
         - ingredient_id
         - quantity
         - recipe_id

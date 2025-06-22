@@ -75,7 +75,6 @@ insert_permissions:
         creator_id:
           _eq: X-Hasura-User-Id
       set:
-        created_at: ""
         creator_id: x-hasura-User-Id
       columns:
         - category_id
@@ -119,8 +118,6 @@ select_permissions:
         - updated_at
       filter:
         _and:
-          - creator_id:
-              _eq: X-Hasura-User-Id
           - deleted_at:
               _is_null: false
     comment: ""
